@@ -1,0 +1,25 @@
+*/._*
+.ipynb_checkpoints/
+logs*/
+scratch/
+old/
+sounds/
+checkpoints/*
+nohup.out
+*.pyc
+'#'*
+.\#*
+\#*
+*~
+._*
+*.zip
+DataPrep/ESC-50-wav/
+DataPrep/esc50Qspect/
+DataPrep/stft/
+#damn, cant seem to ignore this hidden directory!
+DataPrep/.ipynb_checkpoints/
+!/.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+*/*checkpoint.ipynb
+
+
