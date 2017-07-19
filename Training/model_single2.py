@@ -33,16 +33,16 @@ def conv_net(x, weights, biases, dropout):
     
 # Store layers weight & bias
 weights = {
-    # 5x5 conv, 1 input, 180 outputs
-    'wc1': tf.Variable(tf.truncated_normal([3, 3, 1, 180], stddev=0.1)),
-    # fully connected, (37//4=10)*(50//4=13)*180 inputs, 1200 outputs
-    'wd1': tf.Variable(tf.truncated_normal([-(-IMAGE_HEIGHT//4)*-(-IMAGE_WIDTH//4)*180, 800], stddev=0.1)),
+    # 5x5 conv, 1 input, L1_CHANNELS outputs
+    'wc1': tf.Variable(tf.truncated_normal([3, 3, 1, L1_CHANNELS], stddev=0.1)),
+    # fully connected, (37//4=10)*(50//4=13)*L1_CHANNELS inputs, 1200 outputs
+    'wd1': tf.Variable(tf.truncated_normal([-(-IMAGE_HEIGHT//4)*-(-IMAGE_WIDTH//4)*L1_CHANNELS, FC_SIZE], stddev=0.1)),
     # 1200 inputs, 50 outputs (class prediction)
-    'out': tf.Variable(tf.truncated_normal([800, N_LABELS], stddev=0.1))
+    'out': tf.Variable(tf.truncated_normal([FC_SIZE, N_LABELS], stddev=0.1))
 }
 
 biases = {
-    'bc1': tf.Variable(tf.zeros([180])),
-    'bd1': tf.Variable(tf.constant(1.0,shape=[800])),
+    'bc1': tf.Variable(tf.zeros([L1_CHANNELS])),
+    'bd1': tf.Variable(tf.constant(1.0,shape=[FC_SIZE])),
     'out': tf.Variable(tf.constant(1.0,shape=[N_LABELS]))
 }
