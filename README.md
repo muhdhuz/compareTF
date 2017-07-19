@@ -8,12 +8,12 @@ Supported transformations:
 * MFCC
 
 Required libraries:
-For data preperation
-* pillow
-* librosa
-* pyWavelets (only for CWT)
-* scipy
-For classification
-* Tensorflow (>ver 1.0)
+* For data preperation
+  * pillow
+  * librosa
+  * pyWavelets (only for CWT)
+  * scipy
+* For classification  
+  * Tensorflow (>ver 1.0)
 
 
