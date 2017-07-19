@@ -45,10 +45,12 @@ def specScale(outimg, fname, neww, newh, newscale, lwinfo=None):
     SC = (outimg-np.amin(outimg))/shift
     SC2 = (newscale[1]-newscale[0])*SC + newscale[0]
     savimg2 = Image.fromarray(np.flipud(SC2))
-    savimg2.save(fname+'.tif', tiffinfo=info)  
-    #jpgimg = Image.open(fname+'.tif').convert('L')
-    #jpgimg.save(fname+'.jpg', tiffinfo=info)  
+    savimg2.save(fname +'.tif', tiffinfo=info)   
     return SC2
+
+def tif2png(fname, pngname):
+    pngimg = Image.open(fname +'.tif').convert('L')
+    pngimg.save(pngname +'.png')
 
 def invSpecScale(fname):
     """
@@ -63,8 +65,8 @@ def invSpecScale(fname):
         lwinfo = {}
         lwinfo['oldmin'] = -80.
         lwinfo['oldmax'] = 0.
-        lwinfo['newmin'] = -1
-        lwinfo['newmax'] = 1
+        lwinfo['newmin'] = 0
+        lwinfo['newmax'] = 255
         img.tag[270] = json.dumps(lwinfo)
     
     lwinfo = json.loads(img.tag[270][0])
@@ -72,7 +74,6 @@ def invSpecScale(fname):
     outimg = np.asarray(img, dtype=np.float32)
     outimg = (outimg - a)/(b-a)*(maxx-minx) + minx
     return np.flipud(outimg), lwinfo
-        
 
 #------------------------------------------------
 # Some of Lonce's scaling routines below
