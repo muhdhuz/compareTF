@@ -215,7 +215,7 @@ def _process_image(filename, coder):
   """
   # Read the image file.
   print(filename)
-  image_data = tf.gfile.FastGFile(filename, 'r').read()
+  image_data = tf.gfile.FastGFile(filename, 'rb').read()
 
   # Decode the Grayscale PNG.
   image = coder.decode_png(image_data)
