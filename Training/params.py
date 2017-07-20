@@ -1,13 +1,15 @@
 # Data Location
 dataset_name = "ESC50" #supports ESC50 and US8K
 
-STFT_dataset_path = "../DataPrep/stft"
+STFT_dataset_path = "../DataPrep/stft_png"
 
 #STFT_dataset_path = "C:/Users/Huz/Documents/python_scripts/comparing_TF_representations/compare_TF_rep/DataPrep/stft"
 #CQT_dataset_path = "C:/Users/Huz/Documents/python_scripts/Comparing_TF_representations/US8K/data/2/cqt"
 #MEL_dataset_path = "C:/Users/Huz/Documents/python_scripts/Comparing_TF_representations/US8K/data/2/mel"
 #WAVE_dataset_path = "C:/Users/Huz/Documents/python_scripts/Comparing_TF_representations/ESC50/data/1/wavelet"
 #MFCC_dataset_path = "C:/Users/Huz/Documents/python_scripts/Comparing_TF_representations/ESC50/data/1/mfcc"
+
+INDIR=STFT_dataset_path
 
 save_path = "../Results" #path to save output
 
