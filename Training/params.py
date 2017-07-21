@@ -23,7 +23,7 @@ IMAGE_HEIGHT = k_freqbins #pixel height ie. frequency bins
 NUM_CHANNELS = 1 #no of image channels
 N_LABELS = 2 #no.of classes
 
-
+files_per_fold = 4
 
 ##################################################
 # model params
@@ -37,6 +37,8 @@ batch_size = 2
 epochs = 2
 TOTAL_RUNS = 1 #no. of rounds of k-fold cross validation done
 
+testNSteps = 2 # test every n steps
+test_batches_per_epoch = int(files_per_fold/batch_size)
 
 # Network Parameters
 epsilon = 1e-08 #epsilon value for Adam optimizer
