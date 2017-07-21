@@ -13,6 +13,7 @@ def getImage(filenames, nepochs=None, mtlclasses=0):
 
     # read the full set of features for a single example 
     key, fullExample = recordReader.read(filenameQ)
+    print("TFRecordReader produced " + str(recordReader.num_records_produced()) + " records")
 
     # parse the full example into its' component features.
     features = tf.parse_single_example(
@@ -39,14 +40,14 @@ def getImage(filenames, nepochs=None, mtlclasses=0):
     if mtlclasses : 
         mtlabel = features['image/class/label_2']
 
+
     # Decode the jpeg
-    with tf.name_scope('decode_jpeg',[image_buffer], None):
+    with tf.name_scope('decode_png',[image_buffer], None):
         # decode
-        image = tf.image.decode_jpeg(image_buffer, channels=1)
+        image = tf.image.decode_png(image_buffer, channels=1)
     
         # and convert to single precision data type
         image = tf.image.convert_image_dtype(image, dtype=tf.float32)
-
 
     if mtlclasses : 
         return label, image, mtlabel

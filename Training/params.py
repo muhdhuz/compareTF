@@ -13,11 +13,17 @@ INDIR=STFT_dataset_path
 
 save_path = "../Results" #path to save output
 
+
+k_freqbins = 513
+k_numFrames = 214
+
 # Image Parameters
-IMAGE_WIDTH= 214  #pixel width ie. time bins
-IMAGE_HEIGHT = 513 #pixel height ie. frequency bins
+IMAGE_WIDTH= k_numFrames  #pixel width ie. time bins
+IMAGE_HEIGHT = k_freqbins #pixel height ie. frequency bins
 NUM_CHANNELS = 1 #no of image channels
 N_LABELS = 2 #no.of classes
+
+
 
 ##################################################
 # model params
@@ -30,6 +36,7 @@ FC_SIZE = 100 # 800
 batch_size = 2
 epochs = 2
 TOTAL_RUNS = 1 #no. of rounds of k-fold cross validation done
+
 
 # Network Parameters
 epsilon = 1e-08 #epsilon value for Adam optimizer
