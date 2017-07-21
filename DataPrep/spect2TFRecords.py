@@ -92,19 +92,25 @@ k_colorspace = 'GrayScale' # https://www.tensorflow.org/api_guides/python/image
 k_channels = 1 # saving songram as 2D GrayScale image for now - try 256 channels later
 k_image_format = 'TIF' # also not used for sonogram TFRecord reading and writing
 
+tf.app.flags.DEFINE_string('main_dir', '.',
+                           'Directory that holds all folds')
 
-
-tf.app.flags.DEFINE_string('train_directory', '/tmp/',
-                           'Training data directory')
-tf.app.flags.DEFINE_string('validation_directory', '/tmp/',
-                           'Validation data directory')
-tf.app.flags.DEFINE_string('output_directory', '/tmp/',
+tf.app.flags.DEFINE_string('fold1_dir', tf.app.flags.FLAGS.main_dir + '/1',
+                           'Training data fold1 directory')
+tf.app.flags.DEFINE_string('fold2_dir', tf.app.flags.FLAGS.main_dir + '/2',
+                           'Training data fold2 directory')
+tf.app.flags.DEFINE_string('fold3_dir', tf.app.flags.FLAGS.main_dir + '/3',
+                           'Training data fold3 directory')
+tf.app.flags.DEFINE_string('fold4_dir', tf.app.flags.FLAGS.main_dir + '/4',
+                           'Training data fold4 directory')
+tf.app.flags.DEFINE_string('fold5_dir', tf.app.flags.FLAGS.main_dir + '/5',
+                           'Training data fold5 directory')
+tf.app.flags.DEFINE_string('output_dir', tf.app.flags.FLAGS.main_dir,
                            'Output data directory')
 
 tf.app.flags.DEFINE_integer('train_shards', 2,
                             'Number of shards in training TFRecord files.')
-tf.app.flags.DEFINE_integer('validation_shards', 2,
-                            'Number of shards in validation TFRecord files.')
+
 tf.app.flags.DEFINE_integer('num_threads', 2,
                             'Number of threads to preprocess the images.')
 
@@ -115,7 +121,7 @@ tf.app.flags.DEFINE_integer('num_threads', 2,
 #   flower
 # where each line corresponds to a label. We map each label contained in
 # the file to an integer corresponding to the line number starting from 0.
-tf.app.flags.DEFINE_string('labels_file', '', 'Labels file')
+tf.app.flags.DEFINE_string('labels_file', 'labels.txt', 'Labels file')
 
 
 FLAGS = tf.app.flags.FLAGS
@@ -129,7 +135,15 @@ def _int64_feature(value):
 
 def _bytes_feature(value):
   """Wrapper for inserting bytes features into Example proto."""
+  #if not isinstance(value, list):
+  #  value = [value]
   return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
+
+def _float_feature(value):
+  """Wrapper for inserting float features into Example proto."""
+  if not isinstance(value, list):
+    value = [value]
+  return tf.train.Feature(float_list=tf.train.FloatList(value=value))
 
 def _convert_to_example(filename, image_buffer, label, text, height, width):
   """Build an Example proto for an example.
@@ -143,7 +157,6 @@ def _convert_to_example(filename, image_buffer, label, text, height, width):
   Returns:
     Example proto
   """
-
   example = tf.train.Example(features=tf.train.Features(feature={
       'image/height': _int64_feature(height),
       'image/width': _int64_feature(width),
@@ -156,87 +169,62 @@ def _convert_to_example(filename, image_buffer, label, text, height, width):
       'image/encoded': _bytes_feature(tf.compat.as_bytes(image_buffer))}))
   return example
 
+
 class ImageCoder(object):
   """Helper class that provides TensorFlow image coding utilities."""
 
   def __init__(self):
     # Create a single Session to run all image coding calls.
     self._sess = tf.Session()
+    
+    # Initializes function that decodes Grayscale PNG data.
+    self._decode_png_data = tf.placeholder(dtype=tf.string)
+    self._decode_png = tf.image.decode_png(self._decode_png_data, channels=k_channels)
+ 
+ 
+  def decode_png(self, image_data):
+    # Decode the image data as a png image
+    image = self._sess.run(self._decode_png,
+                               feed_dict={self._decode_png_data: image_data})
+    assert len(image.shape) == 3 # "PNG needs to have height x width x channels"
+    assert image.shape[2] == k_channels #"Our spectrograms have 1 channel (Grayscale)"
+    return image
+  
 
-##VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-##==    # Initializes function that converts PNG to JPEG data.
-##==    self._png_data = tf.placeholder(dtype=tf.string)
-##==    image = tf.image.decode_png(self._png_data, channels=k_channels)
-##==    self._png_to_jpeg = tf.image.encode_jpeg(image, format='rgb', quality=100)
-##==
-##==    # Initializes function that decodes RGB JPEG data.
-    self._decode_jpeg_data = tf.placeholder(dtype=tf.string)
-    self._decode_jpeg = tf.image.decode_jpeg(self._decode_jpeg_data, channels=k_channels)
-##==
-##==  def png_to_jpeg(self, image_data):
-##==    return self._sess.run(self._png_to_jpeg,
-##==                          feed_dict={self._png_data: image_data})
-##==
-  def decode_jpeg(self, image_data):
-      image = self._sess.run(self._decode_jpeg,
-                             feed_dict={self._decode_jpeg_data: image_data})
-      assert len(image.shape) == 3
-      assert image.shape[2] == k_channels
-      return image
-##==
-##==
-##==def _is_png(filename):
-##==  """Determine if a file contains a PNG format image.
-##==
-##==  Args:
-##==    filename: string, path of the image file.
-##==
-##==  Returns:
-##==    boolean indicating if the image is a PNG.
-##==  """
-##==  return '.png' in filename
-##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+def _is_tif(filename):
+  """Determine if a file contains a TIF format image.
+  Args:
+    filename: string, path of the image file.
+  Returns:
+    boolean indicating if the image is a TIF.
+  * Unused since we save a png version of the TIF images during the spec conversion
+  """
+  _, file_extension = os.path.splitext(filename)
+  return file_extension.lower() == '.tif'
+
 
 def _process_image(filename, coder):
   """Process a single image file.
   Args:
-    filename: string, path to an image file e.g., '/path/to/example.JPG'.
+    filename: string, path to an image file e.g., '/path/to/example.png'.
     coder: instance of ImageCoder to provide TensorFlow image coding utils.
   Returns:
-    image_buffer: string, JPEG encoding of RGB image.
+    image_buffer: string, png encoding of grayscale image.
     height: integer, image height in pixels.
     width: integer, image width in pixels.
   """
   # Read the image file.
-    #Converts grayscal tif images to jpg images and saves them in /tmp
-  img = Image.open(filename).point(lambda i: i*255).convert('L')
-  img.save('/tmp/' + os.path.basename(filename) + ".jpg")
+  print(filename)
+  image_data = tf.gfile.FastGFile(filename, 'rb').read()
 
-  with tf.gfile.FastGFile('/tmp/' + os.path.basename(filename) + ".jpg", 'r') as f:
-    newfilename = '/tmp/' + os.path.basename(filename) + '.jpg'
-    print('reading ' + newfilename)
-    image_data = f.read()
+  # Decode the Grayscale PNG.
+  image = coder.decode_png(image_data)
 
-
-##VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
-## Convert any PNG to JPEG's for consistency.
-##=  if _is_png(filename):
-##=     print('Converting PNG to JPEG for %s' % filename)
-##=     image_data = coder.png_to_jpeg(image_data)
-  
-  # Decode the RGB JPEG.
-  image = coder.decode_jpeg(image_data)
-
-##^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-
-  #print('_process_image image_data.ma.shape is ' + str(np.ma.shape(image_data)))
-
-  # Check that image converted to RGB
-  assert len(image.shape) == 3  #height, width , channels
+  # Check that image converted to Grayscale
+  assert len(image.shape) == 3
   height = image.shape[0]
   width = image.shape[1]
-  assert image.shape[2] == k_channels 
+  assert image.shape[2] == k_channels
 
   return image_data, height, width
 
@@ -272,15 +260,18 @@ def _process_image_files_batch(coder, thread_index, ranges, name, filenames,
     # Generate a sharded version of the file name, e.g. 'train-00002-of-00010'
     shard = thread_index * num_shards_per_batch + s
     output_filename = '%s-%.5d-of-%.5d' % (name, shard, num_shards)
-    output_file = os.path.join(FLAGS.output_directory, output_filename)
+    output_file = os.path.join(FLAGS.output_dir, output_filename)
     writer = tf.python_io.TFRecordWriter(output_file)
 
     shard_counter = 0
     files_in_shard = np.arange(shard_ranges[s], shard_ranges[s + 1], dtype=int)
+    
     for i in files_in_shard:
       filename = filenames[i]
       label = labels[i]
       text = texts[i]
+      
+      #print(filename,label,text)
 
       image_buffer, height, width = _process_image(filename, coder)
 
@@ -300,6 +291,7 @@ def _process_image_files_batch(coder, thread_index, ranges, name, filenames,
           (datetime.now(), thread_index, shard_counter, output_file))
     sys.stdout.flush()
     shard_counter = 0
+  
   print('%s [thread %d]: Wrote %d images to %d shards.' %
         (datetime.now(), thread_index, counter, num_files_in_thread))
   sys.stdout.flush()
@@ -382,10 +374,10 @@ def _find_image_files(data_dir, labels_file):
   # Leave label index 0 empty as a background class.
   label_index = 1
 
-  # Construct the list of JPEG files and labels.
+  # Construct the list of files and labels.
   for text in unique_labels:
-    jpeg_file_path = '%s/%s/*' % (data_dir, text)
-    matching_files = tf.gfile.Glob(jpeg_file_path)
+    file_path = '%s/%s/*' % (data_dir, text)
+    matching_files = tf.gfile.Glob(file_path)
 
     labels.extend([label_index] * len(matching_files))
     texts.extend([text] * len(matching_files))
@@ -407,7 +399,7 @@ def _find_image_files(data_dir, labels_file):
   texts = [texts[i] for i in shuffled_index]
   labels = [labels[i] for i in shuffled_index]
 
-  print('Found %d JPEG files across %d labels inside %s.' %
+  print('Found %d PNG files across %d labels inside %s.' %
         (len(filenames), len(unique_labels), data_dir))
   return filenames, texts, labels
 
@@ -425,17 +417,23 @@ def _process_dataset(name, directory, num_shards, labels_file):
 
 
 def main(unused_argv):
-  assert not FLAGS.train_shards % FLAGS.num_threads, (
-      'Please make the FLAGS.num_threads commensurate with FLAGS.train_shards')
-  assert not FLAGS.validation_shards % FLAGS.num_threads, (
-      'Please make the FLAGS.num_threads commensurate with '
-      'FLAGS.validation_shards')
-  print('Saving results to %s' % FLAGS.output_directory)
+  #assert not FLAGS.train_shards % FLAGS.num_threads, (
+  #    'Please make the FLAGS.num_threads commensurate with FLAGS.train_shards')
+  #assert not FLAGS.validation_shards % FLAGS.num_threads, (
+  #    'Please make the FLAGS.num_threads commensurate with '
+  #    'FLAGS.validation_shards')
+  #print('Saving results to %s' % FLAGS.output_directory)
 
   # Run it!
-  _process_dataset('validation', FLAGS.validation_directory,
-                   FLAGS.validation_shards, FLAGS.labels_file)
-  _process_dataset('train', FLAGS.train_directory,
+  _process_dataset('fold1', FLAGS.fold1_dir,
+                   FLAGS.train_shards, FLAGS.labels_file)
+  _process_dataset('fold2', FLAGS.fold2_dir,
+                   FLAGS.train_shards, FLAGS.labels_file)
+  _process_dataset('fold3', FLAGS.fold3_dir,
+                   FLAGS.train_shards, FLAGS.labels_file)
+  _process_dataset('fold4', FLAGS.fold4_dir,
+                   FLAGS.train_shards, FLAGS.labels_file)
+  _process_dataset('fold5', FLAGS.fold5_dir,
                    FLAGS.train_shards, FLAGS.labels_file)
 
 
