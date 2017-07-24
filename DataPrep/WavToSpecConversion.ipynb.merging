@@ -146,22 +146,19 @@
   {
    "cell_type": "code",
    "execution_count": 4,
+<<<<<<< HEAD
+   "metadata": {
+    "collapsed": false
+   },
+=======
    "metadata": {},
+>>>>>>> TFrec-br
    "outputs": [
     {
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "creating ./ESC-50-wav/102 - Rooster\n",
-      "creating ./ESC-50-wav/102 - Rooster\n",
-      "creating ./ESC-50-wav/102 - Rooster\n",
-      "creating ./ESC-50-wav/102 - Rooster\n",
-      "creating ./ESC-50-wav/102 - Rooster\n",
-      "creating ./ESC-50-wav/102 - Rooster\n",
-      "creating ./ESC-50-wav/102 - Rooster\n",
-      "creating ./ESC-50-wav/102 - Rooster\n",
-      "creating ./ESC-50-wav/102 - Rooster\n",
-      "creating ./ESC-50-wav/102 - Rooster\n",
+<<<<<<< HEAD
       "creating ./ESC-50-wav/101 - Dog\n",
       "creating ./ESC-50-wav/101 - Dog\n",
       "creating ./ESC-50-wav/101 - Dog\n",
@@ -172,6 +169,31 @@
       "creating ./ESC-50-wav/101 - Dog\n",
       "creating ./ESC-50-wav/101 - Dog\n",
       "creating ./ESC-50-wav/101 - Dog\n",
+=======
+>>>>>>> TFrec-br
+      "creating ./ESC-50-wav/102 - Rooster\n",
+      "creating ./ESC-50-wav/102 - Rooster\n",
+      "creating ./ESC-50-wav/102 - Rooster\n",
+      "creating ./ESC-50-wav/102 - Rooster\n",
+      "creating ./ESC-50-wav/102 - Rooster\n",
+      "creating ./ESC-50-wav/102 - Rooster\n",
+      "creating ./ESC-50-wav/102 - Rooster\n",
+      "creating ./ESC-50-wav/102 - Rooster\n",
+      "creating ./ESC-50-wav/102 - Rooster\n",
+      "creating ./ESC-50-wav/102 - Rooster\n",
+<<<<<<< HEAD
+=======
+      "creating ./ESC-50-wav/101 - Dog\n",
+      "creating ./ESC-50-wav/101 - Dog\n",
+      "creating ./ESC-50-wav/101 - Dog\n",
+      "creating ./ESC-50-wav/101 - Dog\n",
+      "creating ./ESC-50-wav/101 - Dog\n",
+      "creating ./ESC-50-wav/101 - Dog\n",
+      "creating ./ESC-50-wav/101 - Dog\n",
+      "creating ./ESC-50-wav/101 - Dog\n",
+      "creating ./ESC-50-wav/101 - Dog\n",
+      "creating ./ESC-50-wav/101 - Dog\n",
+>>>>>>> TFrec-br
       "COMPLETE\n"
      ]
     }
@@ -227,6 +249,10 @@
    "source": [
     "#routines to convert wav to spectrograms using Librosa as backend. For wavelets we are using Pywavelet library.\n",
     "import scipy\n",
+<<<<<<< HEAD
+    "\n",
+=======
+>>>>>>> TFrec-br
     "from PIL import TiffImagePlugin\n",
     "from PIL import Image\n",
     "\n",
@@ -273,7 +299,11 @@
     "                \n",
     "    return D\n",
     "\n",
+<<<<<<< HEAD
+    "def wav2cwt(fname, srate, freq_bins, wavelet='morl', dur=None, showplt=False) :\n",
+=======
     "def wav2cwt(fname, srate, freq_bins, wavelet='morl', dur=None, showplt=False):\n",
+>>>>>>> TFrec-br
     "    import pywt\n",
     "    try:\n",
     "        audiodata, samplerate = librosa.load(fname, sr=srate, mono=True, duration=dur) \n",
@@ -424,7 +454,11 @@
   },
   {
    "cell_type": "code",
+<<<<<<< HEAD
+   "execution_count": 8,
+=======
    "execution_count": 9,
+>>>>>>> TFrec-br
    "metadata": {
     "scrolled": true
    },
@@ -433,6 +467,29 @@
      "name": "stdout",
      "output_type": "stream",
      "text": [
+<<<<<<< HEAD
+      "0: 101 - Dog/1-30226-A\n",
+      "1: 101 - Dog/1-30344-A\n",
+      "2: 101 - Dog/2-114280-A\n",
+      "3: 101 - Dog/2-114587-A\n",
+      "4: 101 - Dog/3-136288-A\n",
+      "5: 101 - Dog/3-144028-A\n",
+      "6: 101 - Dog/4-182395-A\n",
+      "7: 101 - Dog/4-183992-A\n",
+      "8: 101 - Dog/5-203128-A\n",
+      "9: 101 - Dog/5-9032-A\n",
+      "creating ./stft2/102 - Rooster\n",
+      "10: 102 - Rooster/1-26806-A\n",
+      "11: 102 - Rooster/1-27724-A\n",
+      "12: 102 - Rooster/2-65750-A\n",
+      "13: 102 - Rooster/2-71162-A\n",
+      "14: 102 - Rooster/3-107219-A\n",
+      "15: 102 - Rooster/3-116135-A\n",
+      "16: 102 - Rooster/4-164021-A\n",
+      "17: 102 - Rooster/4-164064-A\n",
+      "18: 102 - Rooster/5-194930-A\n",
+      "19: 102 - Rooster/5-194930-B\n",
+=======
       "0: 102 - Rooster/2-65750-A\n",
       "1: 102 - Rooster/3-107219-A\n",
       "2: 102 - Rooster/4-164064-A\n",
@@ -453,6 +510,7 @@
       "17: 101 - Dog/1-30344-A\n",
       "18: 101 - Dog/5-9032-A\n",
       "19: 101 - Dog/4-183992-A\n",
+>>>>>>> TFrec-br
       "COMPLETE\n"
      ]
     }
@@ -463,8 +521,15 @@
   },
   {
    "cell_type": "code",
+<<<<<<< HEAD
+   "execution_count": 9,
+   "metadata": {
+    "collapsed": true
+   },
+=======
    "execution_count": 15,
    "metadata": {},
+>>>>>>> TFrec-br
    "outputs": [],
    "source": [
     "# output human readable class labels into text file (required for TFRecords)\n",
@@ -480,7 +545,11 @@
   },
   {
    "cell_type": "code",
+<<<<<<< HEAD
+   "execution_count": 10,
+=======
    "execution_count": 11,
+>>>>>>> TFrec-br
    "metadata": {
     "collapsed": true
    },
@@ -540,7 +609,11 @@
   },
   {
    "cell_type": "code",
+<<<<<<< HEAD
+   "execution_count": 14,
+=======
    "execution_count": 12,
+>>>>>>> TFrec-br
    "metadata": {
     "collapsed": true
    },
@@ -570,6 +643,34 @@
     "    \n",
     "    folds = get_subdirs(topdir)\n",
     "    count = 0\n",
+<<<<<<< HEAD
+    "    for subdir in subdirs :\n",
+    "        try:\n",
+    "            os.stat(outdir + '/'  + subdir) # test for existence\n",
+    "        except:\n",
+    "            os.mkdir(outdir + '/' + subdir) # create if necessary\n",
+    "            print('creating ' + outdir + '/'  + subdir)\n",
+    "    \n",
+    "        fullpaths, _ = listDirectory(topdir + '/' + subdir, '.tif') \n",
+    "        \n",
+    "        for idx in range(len(fullpaths)) : \n",
+    "            fname = os.path.basename(fullpaths[idx])\n",
+    "            D, tiffinfo = tiffspect.invSpecScale(fullpaths[idx])            \n",
+    "            #print('tiffinfo is ' + str(tiffinfo))\n",
+    "            \n",
+    "            # Here's the beef\n",
+    "            MD = np.dot(M,D);\n",
+    "            MD = scipy.signal.resample(MD, LIN_FREQ_BINS) #downsample to something reasonable \n",
+    "\n",
+    "            #save\n",
+    "            tiffinfo[\"linFreqBins\"] =  LIN_FREQ_BINS\n",
+    "            tiffinfo[\"lowRow\"] = LOW_ROW\n",
+    "            tiffinfo[\"logFreqBins\"] = LOG_FREQ_BINS\n",
+    "            tiffspect.specScale(MD, outdir + '/' + subdir + '/' + os.path.splitext(fname)[0] , neww, newh, newscale, lwinfo=tiffinfo)\n",
+    "            \n",
+    "            print(str(count) + ': ' + subdir + '/' + os.path.splitext(fname)[0])\n",
+    "            count +=1\n",
+=======
     "    for fold in folds:\n",
     "        subdir = get_subdirs(topdir + '/' + fold)\n",
     "        for classes in subdir:\n",
@@ -607,13 +708,21 @@
     "                \n",
     "                print(str(count) + ': ' + classes + '/' + os.path.splitext(fname)[0])\n",
     "                count +=1\n",
+>>>>>>> TFrec-br
     "    print(\"COMPLETE\") "
    ]
   },
   {
    "cell_type": "code",
+<<<<<<< HEAD
+   "execution_count": 15,
+   "metadata": {
+    "collapsed": false
+   },
+=======
    "execution_count": 13,
    "metadata": {},
+>>>>>>> TFrec-br
    "outputs": [
     {
      "name": "stdout",
@@ -621,6 +730,30 @@
      "text": [
       "opr is 2018\n",
       "H is 513\n",
+<<<<<<< HEAD
+      "creating ./esc50Qspect/101 - Dog\n",
+      "0: 101 - Dog/1-30226-A\n",
+      "1: 101 - Dog/1-30344-A\n",
+      "2: 101 - Dog/2-114280-A\n",
+      "3: 101 - Dog/2-114587-A\n",
+      "4: 101 - Dog/3-136288-A\n",
+      "5: 101 - Dog/3-144028-A\n",
+      "6: 101 - Dog/4-182395-A\n",
+      "7: 101 - Dog/4-183992-A\n",
+      "8: 101 - Dog/5-203128-A\n",
+      "9: 101 - Dog/5-9032-A\n",
+      "creating ./esc50Qspect/102 - Rooster\n",
+      "10: 102 - Rooster/1-26806-A\n",
+      "11: 102 - Rooster/1-27724-A\n",
+      "12: 102 - Rooster/2-65750-A\n",
+      "13: 102 - Rooster/2-71162-A\n",
+      "14: 102 - Rooster/3-107219-A\n",
+      "15: 102 - Rooster/3-116135-A\n",
+      "16: 102 - Rooster/4-164021-A\n",
+      "17: 102 - Rooster/4-164064-A\n",
+      "18: 102 - Rooster/5-194930-A\n",
+      "19: 102 - Rooster/5-194930-B\n",
+=======
       "0: 102 - Rooster/2-65750-A\n",
       "1: 102 - Rooster/2-71162-A\n",
       "2: 101 - Dog/2-114587-A\n",
@@ -641,6 +774,7 @@
       "17: 102 - Rooster/1-27724-A\n",
       "18: 101 - Dog/1-30344-A\n",
       "19: 101 - Dog/1-30226-A\n",
+>>>>>>> TFrec-br
       "COMPLETE\n"
      ]
     }
@@ -651,7 +785,11 @@
   },
   {
    "cell_type": "code",
+<<<<<<< HEAD
+   "execution_count": 13,
+=======
    "execution_count": 14,
+>>>>>>> TFrec-br
    "metadata": {
     "collapsed": true
    },
@@ -714,9 +852,9 @@
  "metadata": {
   "anaconda-cloud": {},
   "kernelspec": {
-   "display_name": "Python 3",
+   "display_name": "Python [conda env:py36]",
    "language": "python",
-   "name": "python3"
+   "name": "conda-env-py36-py"
   },
   "language_info": {
    "codemirror_mode": {
@@ -728,7 +866,11 @@
    "name": "python",
    "nbconvert_exporter": "python",
    "pygments_lexer": "ipython3",
+<<<<<<< HEAD
+   "version": "3.6.1"
+=======
    "version": "3.5.3"
+>>>>>>> TFrec-br
   }
  },
  "nbformat": 4,
