@@ -9,7 +9,7 @@ Supported transformations:
 
 ### Data Preparation
 Required libraries:
-* Python 2.7 (Python 3.5 returns 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte error for TFRecords, else  works fine. I use python 3.5 for everything except when running spect2TFRecords.sh)
+* Python 3.5
 * Jupyter Notebook
 * pillow
 * [librosa 0.5.1](https://librosa.github.io/librosa/install.html)
