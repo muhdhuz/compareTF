@@ -186,8 +186,6 @@ saver = tf.train.Saver()
 
 #create Session and run training/validation
 #*************************************
-max_acc = []
-max_epochs = []
 test_acc_list = []
 
 start_time_long = time.monotonic()
