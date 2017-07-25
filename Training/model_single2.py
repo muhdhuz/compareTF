@@ -28,21 +28,40 @@ def conv_net(x, weights, biases, dropout):
     fc1 = tf.nn.dropout(fc1, dropout)
     
     # Output, class prediction
-    out = tf.add(tf.matmul(fc1, weights['out']), biases['out'])
+    out = tf.add(tf.matmul(fc1, weights['wout']), biases['bout'])
     return out
     
 # Store layers weight & bias
 weights = {
     # 5x5 conv, 1 input, L1_CHANNELS outputs
-    'wc1': tf.Variable(tf.truncated_normal([3, 3, 1, L1_CHANNELS], stddev=0.1)),
+    'wc1': tf.Variable(tf.truncated_normal([3, 3, 1, L1_CHANNELS], stddev=0.1), name='wc1'),
     # fully connected, (37//4=10)*(50//4=13)*L1_CHANNELS inputs, 1200 outputs
-    'wd1': tf.Variable(tf.truncated_normal([-(-IMAGE_HEIGHT//4)*-(-IMAGE_WIDTH//4)*L1_CHANNELS, FC_SIZE], stddev=0.1)),
+    'wd1': tf.Variable(tf.truncated_normal([-(-K_FREQBINS//4)*-(-K_NUMFRAMES//4)*L1_CHANNELS, FC_SIZE], stddev=0.1), name='wd1'),
     # 1200 inputs, 50 outputs (class prediction)
-    'out': tf.Variable(tf.truncated_normal([FC_SIZE, N_LABELS], stddev=0.1))
+    'wout': tf.Variable(tf.truncated_normal([FC_SIZE, N_LABELS], stddev=0.1), name='wout')
 }
 
 biases = {
-    'bc1': tf.Variable(tf.zeros([L1_CHANNELS])),
-    'bd1': tf.Variable(tf.constant(1.0,shape=[FC_SIZE])),
-    'out': tf.Variable(tf.constant(1.0,shape=[N_LABELS]))
+    'bc1': tf.Variable(tf.zeros([L1_CHANNELS]), name='bc1'),
+    'bd1': tf.Variable(tf.constant(1.0,shape=[FC_SIZE]), name='bd1'),
+    'bout': tf.Variable(tf.constant(1.0,shape=[N_LABELS]), name='bout')
 }
+
+#######################
+# some model params to output
+K_NUMCONVLAYERS = 1
+L2_CHANNELS = 0
+K_ConvRows = 3 #conv kernel width
+K_ConvCols = 3 #conv kernel height
+k_ConvStrideRows = 1 #kernel horizontal stride
+k_ConvStrideCols = 1 #kernel vertical stride
+k_poolRows = 4
+k_poolStrideRows = 4
+k_downsampledHeight = -(-K_FREQBINS//4)
+k_downsampledWidth = -(-K_NUMFRAMES//4)
+
+
+
+
+
+

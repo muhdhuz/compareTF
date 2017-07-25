@@ -1,2 +1,50 @@
+103 - Pig
+410 - Glass breaking
+505 - Engine
+401 - Door knock
+302 - Sneezing
+403 - Keyboard typing
+109 - Sheep
+202 - Sea waves
+305 - Coughing
+406 - Washing machine
+507 - Church bells
+104 - Cow
+407 - Vacuum cleaner
+105 - Frog
 102 - Rooster
+210 - Thunderstorm
+203 - Crackling fire
+409 - Clock tick
+201 - Rain
+108 - Insects
+508 - Airplane
+509 - Fireworks
+107 - Hen
+308 - Brushing teeth
+306 - Footsteps
+110 - Crow
+204 - Crickets
+208 - Pouring water
+504 - Car horn
+503 - Siren
+206 - Water drops
+408 - Clock alarm
+404 - Door - wood creaks
+207 - Wind
+502 - Chainsaw
+309 - Snoring
+501 - Helicopter
+405 - Can opening
+205 - Chirping birds
+510 - Hand saw
 101 - Dog
+307 - Laughing
+303 - Clapping
+301 - Crying baby
+209 - Toilet flush
+506 - Train
+304 - Breathing
+106 - Cat
+402 - Mouse click
+310 - Drinking - sipping
