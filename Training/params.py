@@ -1,3 +1,16 @@
+import argparse
+
+# pass some user input as flags
+FLAGS = None
+parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument('--fold', type=int, help='fold used as test set for k-fold cross validation', default=1)
+parser.add_argument('--freqorientation', type=str, help='convolution over 1D or 2D. If 1D freq bins treated as channels, if 2D freq bins is the height of input', default='2D')
+parser.add_argument('--model', type=str, help='load the model to train', default='model1') 
+
+FLAGS, unparsed = parser.parse_known_args()
+print('\n FLAGS parsed :  {0}'.format(FLAGS))
+
+#*****************************************************************
 # Data Location
 dataset_name = "ESC50" #supports ESC50 and US8K
 
@@ -18,15 +31,23 @@ K_NUMFRAMES = 214  #pixel width ie. time bins
 K_FREQBINS = 513 #pixel height ie. frequency bins
 NUM_CHANNELS = 1 #no of image channels
 N_LABELS = 50 #no.of classes
-FRE_ORIENTATION = "2D" #supports 2D and 1D
+
+FRE_ORIENTATION = FLAGS.freqorientation #supports 2D and 1D
+if FRE_ORIENTATION in ["2D","1D"]:
+    pass
+else:
+    raise ValueError("please only enter '1D' or '2D'")
+
 
 NUM_THREADS = 4 #threads to read in TFRecords
 files_per_fold = 400 #no. of samples per fold
 
 
 # Model Parameters
-L1_CHANNELS = 20 #180
-FC_SIZE = 100 # 800
+L1_CHANNELS = 24 #180
+L2_CHANNELS = 48
+L3_CHANNELS = 96
+FC_SIZE = 400 # 800
 
 
 # Learning Parameters
@@ -48,7 +69,7 @@ beta = 0.001 # L2-regularization
 
 
 #Tensorboard and Checkpoint Parameters
-display_step = 2 # How often we want to write the tf.summary data to disk. each step denotes 1 mini-batch
+display_step = 5 # How often we want to write the tf.summary data to disk. each step denotes 1 mini-batch
 checkpoint_epoch = 20 #checkpoint and save model every checkpoint_epoch 
 
 
@@ -56,6 +77,3 @@ checkpoint_epoch = 20 #checkpoint and save model every checkpoint_epoch
 # can ignore if not using holdout
 hold_prop = 0.4 #proportion of data used for testing
 rand_seed = 14
-
-#"C:/Users/Huz/Documents/python_scripts/comparing_TF_representations/compare_TF_rep/DataPrep/stft"
-#"C:/Users/Huz/Documents/python_scripts/Comparing_TF_representations/ESC50/data/1/stft"

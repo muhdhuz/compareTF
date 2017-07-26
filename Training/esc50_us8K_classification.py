@@ -5,22 +5,13 @@ import tensorflow as tf
 import time
 from datetime import datetime
 import matplotlib.pyplot as plt
-import argparse
+import importlib
 
 from params import *
-import model_single2 as m #import single-task learning CNN model
 
 import utils.pickledModel as pickledModel
 import utils.spectreader as spectreader
-
-
-FLAGS = None
-parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('--fold', type=int, help='fold used as test set for k-fold cross validation', default=1) 
-
-
-FLAGS, unparsed = parser.parse_known_args()
-print('\n FLAGS parsed :  {0}'.format(FLAGS))
+m = importlib.import_module(FLAGS.model) #import CNN model
 
 
 #some utility functions
@@ -34,25 +25,17 @@ def time_taken(elapsed):
 
 # Create list of paramters for serializing so that network can be properly reconstructed, and for documentation purposes
 ##*************************************
-if FRE_ORIENTATION is "2D":
-    k_height = K_FREQBINS
-    k_inputChannels = 1
-elif FRE_ORIENTATION is "1D":
-    k_height = 1
-    k_inputChannels = K_FREQBINS    
-else:
-    raise ValueError("please only enter '1D' or '2D'")
-
 parameters={
-    'k_height' : k_height, 
+    'k_height' : m.k_height, 
     'k_numFrames' : K_NUMFRAMES, 
-    'k_inputChannels' : k_inputChannels, 
+    'k_inputChannels' : m.k_inputChannels, 
     'K_NUMCONVLAYERS' : m.K_NUMCONVLAYERS, 
     'L1_CHANNELS' : L1_CHANNELS, 
-    'L2_CHANNELS' : m.L2_CHANNELS, 
+    'L2_CHANNELS' : L2_CHANNELS,
+    'L3_CHANNELS' : L3_CHANNELS, 
     'FC_SIZE' : FC_SIZE, 
-    'K_ConvRows' : m.K_ConvRows, 
-    'K_ConvCols' : m.K_ConvCols, 
+    'K_ConvRows' : m.k_ConvRows, 
+    'K_ConvCols' : m.k_ConvCols, 
     'k_ConvStrideRows' : m.k_ConvStrideRows, 
     'k_ConvStrideCols' : m.k_ConvStrideCols, 
     'k_poolRows' : m.k_poolRows, 
@@ -76,8 +59,8 @@ def getImage(fnames, fre_orientation, nepochs=None) :
     
     #no need to flatten - must just be explicit about shape so that shuffle_batch will work
     image = tf.reshape(image,[K_FREQBINS,K_NUMFRAMES,NUM_CHANNELS])
-    if fre_orientation is "1D":
-        image = tf.transpose(image, perm=[0,3,2,1]) #moves freqbins from height to channel dimension
+    if fre_orientation == "1D":
+        image = tf.transpose(image, perm=[2,1,0]) #moves freqbins from height to channel dimension
 
     # re-define label as a "one-hot" vector 
     # it will be [0,1] or [1,0] here. 
@@ -134,9 +117,9 @@ if not os.path.isdir(checkpoint_path): os.mkdir(checkpoint_path)
 
 
 # tf Graph input placeholders
-if FRE_ORIENTATION is "2D":
+if FRE_ORIENTATION == "2D":
     x = tf.placeholder(tf.float32, [BATCH_SIZE, K_FREQBINS, K_NUMFRAMES, NUM_CHANNELS])
-elif FRE_ORIENTATION is "1D":
+elif FRE_ORIENTATION == "1D":
     x = tf.placeholder(tf.float32, [BATCH_SIZE, NUM_CHANNELS, K_NUMFRAMES, K_FREQBINS])
 
 y = tf.placeholder(tf.int32, [None, N_LABELS])
@@ -283,7 +266,6 @@ def trainModel():
         text_file.write("Max validation accuracy is {} at epoch {}\n".format(max(test_acc_list),test_acc_list.index(max(test_acc_list))+1))
 
         elapsed_time = time.monotonic() - start_time
-        print(elapsed_time)
         text_file.write("--- Training time taken: {} ---\n".format(time_taken(elapsed_time)))
         print("--- Training time taken:",time_taken(elapsed_time),"---")
         print("------------------------")
