@@ -172,7 +172,7 @@ saver = tf.train.Saver()
 test_acc_list = []
 
 start_time_long = time.monotonic()
-text_file = open(save_path + "/stft.txt", "w") #save training data
+text_file = open(save_path + text_file_name + "_fold{}.txt".format(fold), "w") #save training data
 print("{} Open Tensorboard at --logdir {}".format(datetime.now(), filewriter_path))
 
 text_file.write('*** Initializing fold #%u as test set ***\n' % fold)
@@ -274,6 +274,46 @@ def trainModel():
         meta_graph_def = tf.train.export_meta_graph(filename=save_path + '/my-model.meta')
         pickledModel.saveState(sess, m.weights, m.biases, parameters, save_path + '/state.pickle') 
 
+        #write hyperparams to file
+        text_file.write("------------------------\n")
+        # Image/Data Parameters
+        text_file.write("*** Image/Data Parameters ***\n")
+        text_file.write("K_NUMFRAMES = {}\n".format(K_NUMFRAMES)) #pixel width ie. time bins
+        text_file.write("K_FREQBINS = {}\n".format(K_FREQBINS)) #pixel height ie. frequency bins
+        text_file.write("NUM_CHANNELS = {}\n".format(NUM_CHANNELS)) #no of image channels
+        text_file.write("N_LABELS = {}\n".format(N_LABELS)) #no.of classes
+        text_file.write("FRE_ORIENTATION = {}\n".format(FRE_ORIENTATION)) #supports 2D and 1D
+        text_file.write("NUM_THREADS = {}\n".format(NUM_THREADS)) #threads to read in TFRecords
+        text_file.write("files_per_fold = {}\n".format(files_per_fold)) #no. of samples per fold
+
+        # Model Parameters
+        text_file.write("*** Model Parameters ***\n")
+        text_file.write("model = {}\n".format(FLAGS.model))
+        text_file.write("L1_CHANNELS = {}\n".format(L1_CHANNELS))
+        text_file.write("L2_CHANNELS = {}\n".format(L2_CHANNELS))
+        text_file.write("L3_CHANNELS = {}\n".format(L3_CHANNELS))
+        text_file.write("FC_SIZE = {}\n".format(FC_SIZE))
+
+        # Learning Parameters
+        text_file.write("*** Learning Parameters ***\n")
+        text_file.write("BATCH_SIZE = {}\n".format(BATCH_SIZE))
+        text_file.write("EPOCHS = {}\n".format(EPOCHS))
+        text_file.write("TOTAL_RUNS = {}\n".format(TOTAL_RUNS))
+
+        # Network Parameters
+        text_file.write("*** Network Parameters ***\n")
+        text_file.write("epsilon = {}\n".format(epsilon)) #epsilon value for Adam optimizer
+        text_file.write("dropout = {}\n".format(dropout)) # Dropout, probability to keep units
+        text_file.write("l2reg = {}\n".format(l2reg)) #if want l2 regularization 
+        text_file.write("l2regfull = {}\n".format(l2regfull))
+        text_file.write("beta = {}\n".format(beta)) # L2-regularization
+
+        #Tensorboard and Checkpoint Parameters
+        text_file.write("*** Tensorboard and Checkpoint Parameters ***\n")
+        text_file.write("display_step = {}\n".format(display_step))
+        text_file.write("checkpoint_epoch = {}\n".format(checkpoint_epoch))
+        
+        text_file.write("------------------------\n")
         writer.close()
         elapsed_time_long = time.monotonic() - start_time_long
         print("*** All runs completed ***")
