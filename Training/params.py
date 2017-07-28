@@ -1,4 +1,5 @@
 import argparse
+import os
 
 # pass some user input as flags
 FLAGS = None
@@ -7,12 +8,27 @@ parser.add_argument('--fold', type=int, help='fold used as test set for k-fold c
 parser.add_argument('--freqorientation', type=str, help='convolution over 1D or 2D. If 1D freq bins treated as channels, if 2D freq bins is the height of input', default='2D')
 parser.add_argument('--model', type=str, help='load the model to train', default='model1') 
 
-FLAGS, unparsed = parser.parse_known_args()
+parser.add_argument('--batchsize', type=int, help='number of data records per training batch', default=20) #default for testing
+parser.add_argument('--n_epochs', type=int, help='number of epochs to use for training', default=8) #default for testing
+
+parser.add_argument('--l1channels', type=int, help='Number of channels in the first convolutional layer', default=24) #default for testing
+parser.add_argument('--l2channels', type=int, help='Number of channels in the second convolutional layer (ignored if numconvlayers is 1)', default=48) #default for testing
+parser.add_argument('--l3channels', type=int, help='Number of channels in the second convolutional layer (ignored if numconvlayers is 1)', default=96) #default for testing
+parser.add_argument('--fcsize', type=int, help='Dimension of the final fully-connected layer', default=400) #default for testing
+
+parser.add_argument('--numLabels', type=int, help='number of classes in data', choices=[2,50], default=50) 
+parser.add_argument('--filesPerFold', type=int, help='number of classes in data', choices=[2,400], default=400) #default for testing
+
+
+parser.add_argument('--save_path', type=str, help='output root directory for logging',  default='../Results') 
+
+FLAGS, unparsed = parser.parse_known_args(CMD_LINE)
 print('\n FLAGS parsed :  {0}'.format(FLAGS))
 
 #*****************************************************************
 # Data Location
 dataset_name = "ESC50" #supports ESC50 and US8K
+TRAINING_FOLDS = 4
 
 STFT_dataset_path = "../DataPrep/stft_png"
 
@@ -23,14 +39,14 @@ STFT_dataset_path = "../DataPrep/stft_png"
 #MFCC_dataset_path = "C:/Users/Huz/Documents/python_scripts/Comparing_TF_representations/ESC50/data/1/mfcc"
 
 INDIR = STFT_dataset_path
-save_path = "../Results" #path to save output
-
+save_path = FLAGS.save_path #path to save output
+if not os.path.isdir(save_path): os.mkdir(save_path)
 
 # Image/Data Parameters
 K_NUMFRAMES = 214  #pixel width ie. time bins
 K_FREQBINS = 513 #pixel height ie. frequency bins
 NUM_CHANNELS = 1 #no of image channels
-N_LABELS = 50 #no.of classes
+N_LABELS = FLAGS.numLabels #no.of classes
 
 FRE_ORIENTATION = FLAGS.freqorientation #supports 2D and 1D
 if FRE_ORIENTATION in ["2D","1D"]:
@@ -38,26 +54,29 @@ if FRE_ORIENTATION in ["2D","1D"]:
 else:
     raise ValueError("please only enter '1D' or '2D'")
 
+#see threading and queueing info: https://www.tensorflow.org/programmers_guide/reading_data
+files_per_fold = FLAGS.filesPerFold #no. of samples per fold
+NUM_THREADS = 4 #threads to read in TFRecords; dont want more threads than there are 
 
-NUM_THREADS = 4 #threads to read in TFRecords
-files_per_fold = 400 #no. of samples per fold
 
 
 # Model Parameters
-L1_CHANNELS = 24 #180
-L2_CHANNELS = 48
-L3_CHANNELS = 96
-FC_SIZE = 400 # 800
+L1_CHANNELS = FLAGS.l1channels
+L2_CHANNELS = FLAGS.l2channels
+L3_CHANNELS = FLAGS.l3channels
+FC_SIZE = FLAGS.fcsize
 
 
 # Learning Parameters
-BATCH_SIZE = 20
-EPOCHS = 5
+BATCH_SIZE = FLAGS.batchsize
+EPOCHS = FLAGS.n_epochs
 TOTAL_RUNS = 1 #no. of rounds of k-fold cross validation done
 
-test_batches_per_epoch = int(files_per_fold/BATCH_SIZE)
-train_batches_per_epoch = int(files_per_fold*4/BATCH_SIZE) #equivalent to steps per epoch
+test_batches_per_epoch = max(1, int(files_per_fold/BATCH_SIZE)) #include check for batch_size > files_per_fold
+train_batches_per_epoch = max(1, int(files_per_fold*TRAINING_FOLDS/BATCH_SIZE)) #equivalent to steps per epoch
 testNSteps = train_batches_per_epoch # test every n steps
+print("Batch_size = " + str(BATCH_SIZE) + ", and files_per_fold is " + str(files_per_fold))
+print("Will test every " + str(testNSteps) + " batches.")
 
 
 # Network Parameters

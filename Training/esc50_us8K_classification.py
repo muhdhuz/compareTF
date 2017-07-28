@@ -88,13 +88,13 @@ datafnames=get_TFR_folds(INDIR, datanumlist)
 target, data = getImage(datafnames, FRE_ORIENTATION, nepochs=EPOCHS)
 
 validatefnames=get_TFR_folds(INDIR, validatenumlist)
-vtarget, vdata = getImage(validatefnames, FRE_ORIENTATION)
+vtarget, vdata = getImage(validatefnames, FRE_ORIENTATION, nepochs=1) #no need to test on multiple epochs
 
 imageBatch, labelBatch = tf.train.shuffle_batch(
     [data, target], batch_size=BATCH_SIZE,
     num_threads=NUM_THREADS,
     allow_smaller_final_batch=True, #want to finish an epoch even if datasize doesn't divide by batchsize
-    enqueue_many=False, #IMPORTANT to get right, default=False - 
+    enqueue_many=False, #IMPORTANT to get right, False means each tensor represents a single example - https://www.tensorflow.org/api_docs/python/tf/train/shuffle_batch
     capacity=1000,  #1000,
     min_after_dequeue=500) #500
 
@@ -113,14 +113,15 @@ filewriter_path = save_path + "/filewriter/"
 checkpoint_path = save_path + "/checkpoint/"
 
 # Create parent path if it doesn't exist
+if not os.path.isdir(filewriter_path): os.mkdir(filewriter_path)
 if not os.path.isdir(checkpoint_path): os.mkdir(checkpoint_path)
 
 
 # tf Graph input placeholders
 if FRE_ORIENTATION == "2D":
-    x = tf.placeholder(tf.float32, [BATCH_SIZE, K_FREQBINS, K_NUMFRAMES, NUM_CHANNELS])
+    x = tf.placeholder(tf.float32, [None, K_FREQBINS, K_NUMFRAMES, NUM_CHANNELS])
 elif FRE_ORIENTATION == "1D":
-    x = tf.placeholder(tf.float32, [BATCH_SIZE, NUM_CHANNELS, K_NUMFRAMES, K_FREQBINS])
+    x = tf.placeholder(tf.float32, [None, NUM_CHANNELS, K_NUMFRAMES, K_FREQBINS])
 
 y = tf.placeholder(tf.int32, [None, N_LABELS])
 keep_prob = tf.placeholder(tf.float32, (), name="keepProb") #dropout (keep probability)
@@ -209,6 +210,7 @@ def trainModel():
                     break
 
                 #create training mini-batch here
+                print("Run batch number " + str(step))
                 batch_data, batch_labels = sess.run([imageBatch, labelBatch])
                 #train and backprop
                 sess.run(optimizer, feed_dict= {x:batch_data, y:batch_labels, keep_prob:dropout})
@@ -222,6 +224,7 @@ def trainModel():
                     writer.add_summary(s, step)
 
                 if (step % testNSteps == 0):
+                    print("testing ................")
                     test_acc = 0.
                     test_count = 0
                     #print("now test for " + str(test_batches_per_epoch) + " test steps")
