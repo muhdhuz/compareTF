@@ -14,7 +14,7 @@ def scale_img(fname, basewidth, baseheight):
     Rescale images according to specified basewidth / baseheight in terms of pixels. 
     Maintains aspect ratio if only basewidth is specified.
     """
-    img = Image.open(fname)
+    img = Image.open(fname +'.tif')
     if (baseheight == None):        
         wpercent = (basewidth / float(img.size[0]))
         hsize = int((float(img.size[1]) * float(wpercent)))
@@ -38,7 +38,7 @@ def specScale(outimg, fname, neww, newh, newscale, lwinfo=None):
     
     if neww is not None:
         savimg = Image.fromarray(outimg)
-        savimg.save(fname, tiffinfo=info)
+        savimg.save(fname +'.tif', tiffinfo=info)
         outimg = scale_img(fname,neww,newh)
     
     shift = np.amax(outimg) - np.amin(outimg)

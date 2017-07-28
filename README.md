@@ -27,11 +27,11 @@ As input we will first generate time-frequency representations of the audio sign
 Required libraries 
 * Tensorflow (ver >1.0)
 
-1. Go the the Training folder. Inside there should be a esc50_us8K_classification.py that allows one to do classification on the ESC50 dataset with a single fold held out as a validation set.
+1. Go to the Training folder. Inside there should be a esc50_us8K_classification.py that allows one to do classification on the ESC50 dataset with a single fold held out as a validation set.
 2. params.py holds some important parameters including data paths, model and network hyperparameters. You can change the hyperparameters to suit your experiment in this file.
 3. In the same params file you can also specify the number of neurons for each layer in the model. Two models are provided - model1 (1 conv layer + 2 fc) and model3 (3 conv layer + 2 fc). If you want to make more drastic changes to the model do it in the individual model files.
-4. When ready, decide whether you want to run validation on a single fold or do k-fold cross validation. For single fold, run esc50_us8K_classification.py. You can specify the validation fold, whether to do 1D (freq bins as channels) or 2D (freq bins as height of input) convolution, and the model in the arguments. 
-5. A bash script has been provided for your convenience to do k-fold. Run it without any arguments and follow the prompts.
+4. When ready, decide whether you want to run validation on a single fold or do k-fold cross validation. For single fold, run esc50_us8K_classification.py. You can specify the folder containing the TFRecords, validation fold, whether to do 1D (freq bins as channels) or 2D (freq bins as height of input) convolution and the model to use in the arguments. 
+5. A bash script kfold_classification.sh has been provided for your convenience to do k-fold. Run it without any arguments and follow the prompts.
 
 TO DO: saveState() in pickledModel.py under utils to take in dictionaries. Also double check compatibility of parameters list to the variables used for style transfer.
 

@@ -4,6 +4,7 @@ import os
 # pass some user input as flags
 FLAGS = None
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument('--datafolder', type=str, help='basename of folder where TFRecords are kept', default='stft_small_png')
 parser.add_argument('--fold', type=int, help='fold used as test set for k-fold cross validation', default=1)
 parser.add_argument('--freqorientation', type=str, help='convolution over 1D or 2D. If 1D freq bins treated as channels, if 2D freq bins is the height of input', default='2D')
 parser.add_argument('--model', type=str, help='load the model to train', default='model1') 
@@ -30,7 +31,7 @@ print('\n FLAGS parsed :  {0}'.format(FLAGS))
 dataset_name = "ESC50" #supports ESC50 and US8K
 TRAINING_FOLDS = 4
 
-STFT_dataset_path = "../DataPrep/stft_png"
+STFT_dataset_path = "../DataPrep/" + FLAGS.datafolder
 
 #STFT_dataset_path = "C:/Users/Huz/Documents/python_scripts/comparing_TF_representations/compare_TF_rep/DataPrep/stft"
 #CQT_dataset_path = "C:/Users/Huz/Documents/python_scripts/Comparing_TF_representations/US8K/data/2/cqt"
@@ -39,12 +40,16 @@ STFT_dataset_path = "../DataPrep/stft_png"
 #MFCC_dataset_path = "C:/Users/Huz/Documents/python_scripts/Comparing_TF_representations/ESC50/data/1/mfcc"
 
 INDIR = STFT_dataset_path
+
 save_path = FLAGS.save_path #path to save output
 if not os.path.isdir(save_path): os.mkdir(save_path)
 
+text_file_name = "/test_small1D" #name of textfile to output with results
+
+
 # Image/Data Parameters
-K_NUMFRAMES = 214  #pixel width ie. time bins
-K_FREQBINS = 513 #pixel height ie. frequency bins
+K_NUMFRAMES = 43  #pixel width ie. time bins
+K_FREQBINS = 103 #pixel height ie. frequency bins
 NUM_CHANNELS = 1 #no of image channels
 N_LABELS = FLAGS.numLabels #no.of classes
 
@@ -61,6 +66,7 @@ NUM_THREADS = 4 #threads to read in TFRecords; dont want more threads than there
 
 
 # Model Parameters
+
 L1_CHANNELS = FLAGS.l1channels
 L2_CHANNELS = FLAGS.l2channels
 L3_CHANNELS = FLAGS.l3channels
@@ -70,6 +76,7 @@ FC_SIZE = FLAGS.fcsize
 # Learning Parameters
 BATCH_SIZE = FLAGS.batchsize
 EPOCHS = FLAGS.n_epochs
+
 TOTAL_RUNS = 1 #no. of rounds of k-fold cross validation done
 
 test_batches_per_epoch = max(1, int(files_per_fold/BATCH_SIZE)) #include check for batch_size > files_per_fold
@@ -88,8 +95,8 @@ beta = 0.001 # L2-regularization
 
 
 #Tensorboard and Checkpoint Parameters
-display_step = 5 # How often we want to write the tf.summary data to disk. each step denotes 1 mini-batch
-checkpoint_epoch = 20 #checkpoint and save model every checkpoint_epoch 
+display_step = 4 # How often we want to write the tf.summary data to disk. each step denotes 1 mini-batch
+checkpoint_epoch = 250 #checkpoint and save model every checkpoint_epoch 
 
 
 # Train/Test holdout split Parameters
