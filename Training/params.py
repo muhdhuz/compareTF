@@ -9,6 +9,10 @@ parser.add_argument('--fold', type=int, help='fold used as test set for k-fold c
 parser.add_argument('--freqorientation', type=str, help='convolution over 1D or 2D. If 1D freq bins treated as channels, if 2D freq bins is the height of input', default='2D')
 parser.add_argument('--model', type=str, help='load the model to train', default='model1') 
 
+parser.add_argument('--freqbins', type=int, help='number of frequency bins in the spectrogram input', default=513) 
+parser.add_argument('--numFrames', type=int, help='number of frames in the spectrogram input (must be divisible by 4)', default=424) 
+
+
 parser.add_argument('--batchsize', type=int, help='number of data records per training batch', default=20) #default for testing
 parser.add_argument('--n_epochs', type=int, help='number of epochs to use for training', default=8) #default for testing
 
@@ -23,7 +27,7 @@ parser.add_argument('--filesPerFold', type=int, help='number of classes in data'
 
 parser.add_argument('--save_path', type=str, help='output root directory for logging',  default='../Results') 
 
-FLAGS, unparsed = parser.parse_known_args(CMD_LINE)
+FLAGS, unparsed = parser.parse_known_args()
 print('\n FLAGS parsed :  {0}'.format(FLAGS))
 
 #*****************************************************************
@@ -46,11 +50,23 @@ if not os.path.isdir(save_path): os.mkdir(save_path)
 
 text_file_name = "/test_small1D" #name of textfile to output with results
 
+K_FREQBINS = FLAGS.freqbins #103 #pixel height ie. frequency bins
 
 # Image/Data Parameters
-K_NUMFRAMES = 43  #pixel width ie. time bins
-K_FREQBINS = 103 #pixel height ie. frequency bins
-NUM_CHANNELS = 1 #no of image channels
+K_NUMFRAMES = FLAGS.numFrames # 43  #pixel width ie. time bins
+
+
+FRE_ORIENTATION=FLAGS.freqorientation
+if FRE_ORIENTATION == "1D" :
+	NUM_CHANNELS = K_FREQBINS #no of image channels
+	K_HEIGHT =1
+	print("orientation is 1D, so setting NUM_CHANNELS to " + str(K_FREQBINS))
+else :
+	NUM_CHANNELS = 1 #no of image channels
+	K_HEIGHT = K_FREQBINS
+	print("orientation is 2D, so setting NUM_CHANNELS to " + str(1))
+
+
 N_LABELS = FLAGS.numLabels #no.of classes
 
 FRE_ORIENTATION = FLAGS.freqorientation #supports 2D and 1D

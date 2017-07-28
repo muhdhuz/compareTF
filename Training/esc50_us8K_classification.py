@@ -58,7 +58,8 @@ def getImage(fnames, fre_orientation, nepochs=None) :
     label, image = spectreader.getImage(fnames, nepochs)
     
     #no need to flatten - must just be explicit about shape so that shuffle_batch will work
-    image = tf.reshape(image,[K_FREQBINS,K_NUMFRAMES,NUM_CHANNELS])
+    print("reshaping with K_HEIGHT = " + str(K_HEIGHT) + ", K_NUMFRAMES = " + str(K_NUMFRAMES) + ", and NUM_CHANNELS = " + str(NUM_CHANNELS) )
+    image = tf.reshape(image,[K_HEIGHT,K_NUMFRAMES,NUM_CHANNELS])
     if fre_orientation == "1D":
         image = tf.transpose(image, perm=[2,1,0]) #moves freqbins from height to channel dimension
 
@@ -88,7 +89,7 @@ datafnames=get_TFR_folds(INDIR, datanumlist)
 target, data = getImage(datafnames, FRE_ORIENTATION, nepochs=EPOCHS)
 
 validatefnames=get_TFR_folds(INDIR, validatenumlist)
-vtarget, vdata = getImage(validatefnames, FRE_ORIENTATION, nepochs=1) #no need to test on multiple epochs
+vtarget, vdata = getImage(validatefnames, FRE_ORIENTATION, nepochs=None) #no need to test on multiple epochs
 
 imageBatch, labelBatch = tf.train.shuffle_batch(
     [data, target], batch_size=BATCH_SIZE,
@@ -118,11 +119,7 @@ if not os.path.isdir(checkpoint_path): os.mkdir(checkpoint_path)
 
 
 # tf Graph input placeholders
-if FRE_ORIENTATION == "2D":
-    x = tf.placeholder(tf.float32, [None, K_FREQBINS, K_NUMFRAMES, NUM_CHANNELS])
-elif FRE_ORIENTATION == "1D":
-    x = tf.placeholder(tf.float32, [None, NUM_CHANNELS, K_NUMFRAMES, K_FREQBINS])
-
+x = tf.placeholder(tf.float32, [None, K_HEIGHT, K_NUMFRAMES, NUM_CHANNELS])
 y = tf.placeholder(tf.int32, [None, N_LABELS])
 keep_prob = tf.placeholder(tf.float32, (), name="keepProb") #dropout (keep probability)
 
@@ -283,6 +280,7 @@ def trainModel():
         text_file.write("*** Image/Data Parameters ***\n")
         text_file.write("K_NUMFRAMES = {}\n".format(K_NUMFRAMES)) #pixel width ie. time bins
         text_file.write("K_FREQBINS = {}\n".format(K_FREQBINS)) #pixel height ie. frequency bins
+        text_file.write("K_HEIGHT = {}\n".format(K_HEIGHT)) #pixel height ie. frequency bins        
         text_file.write("NUM_CHANNELS = {}\n".format(NUM_CHANNELS)) #no of image channels
         text_file.write("N_LABELS = {}\n".format(N_LABELS)) #no.of classes
         text_file.write("FRE_ORIENTATION = {}\n".format(FRE_ORIENTATION)) #supports 2D and 1D

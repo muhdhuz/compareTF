@@ -3,17 +3,17 @@ import tensorflow as tf
 from params import *
 
 if FRE_ORIENTATION == "2D":
-    k_height = K_FREQBINS
+    k_height = K_HEIGHT
     k_inputChannels = NUM_CHANNELS
     k_ConvRows = 3 #conv kernel height
     k_ConvCols = 3 #conv kernel width
     k_poolRows = 4
-    k_downsampledHeight = -(-K_FREQBINS//4)
+    k_downsampledHeight = -(-k_height//4)
     k_downsampledWidth = -(-K_NUMFRAMES//4)
 
 elif FRE_ORIENTATION == "1D":
-    k_height = NUM_CHANNELS
-    k_inputChannels = K_FREQBINS
+    k_height = K_HEIGHT
+    k_inputChannels = NUM_CHANNELS
     k_ConvRows = 1 #conv kernel height
     k_ConvCols = 3 #conv kernel width
     k_poolRows = 1
