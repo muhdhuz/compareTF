@@ -60,8 +60,6 @@ def getImage(fnames, fre_orientation, nepochs=None) :
     #no need to flatten - must just be explicit about shape so that shuffle_batch will work
     print("reshaping with K_HEIGHT = " + str(K_HEIGHT) + ", K_NUMFRAMES = " + str(K_NUMFRAMES) + ", and NUM_CHANNELS = " + str(NUM_CHANNELS) )
     image = tf.reshape(image,[K_HEIGHT,K_NUMFRAMES,NUM_CHANNELS])
-    if fre_orientation == "1D":
-        image = tf.transpose(image, perm=[2,1,0]) #moves freqbins from height to channel dimension
 
     # re-define label as a "one-hot" vector 
     # it will be [0,1] or [1,0] here. 
@@ -207,7 +205,7 @@ def trainModel():
                     break
 
                 #create training mini-batch here
-                print("Run batch number " + str(step))
+                #print("Run batch number " + str(step))
                 batch_data, batch_labels = sess.run([imageBatch, labelBatch])
                 #train and backprop
                 sess.run(optimizer, feed_dict= {x:batch_data, y:batch_labels, keep_prob:dropout})
@@ -221,7 +219,7 @@ def trainModel():
                     writer.add_summary(s, step)
 
                 if (step % testNSteps == 0):
-                    print("testing ................")
+                    #print("testing ................")
                     test_acc = 0.
                     test_count = 0
                     #print("now test for " + str(test_batches_per_epoch) + " test steps")
@@ -230,7 +228,6 @@ def trainModel():
                         try:
                             #prepare test mini-batch
                             test_batch, label_batch = sess.run([vimageBatch, vlabelBatch])
-
                             acc = sess.run(accuracy, feed_dict={x: test_batch, y: label_batch, keep_prob: 1.})
                             test_acc += acc*BATCH_SIZE
                             test_count += 1*BATCH_SIZE
@@ -316,11 +313,11 @@ def trainModel():
         
         text_file.write("------------------------\n")
         writer.close()
-        elapsed_time_long = time.monotonic() - start_time_long
-        print("*** All runs completed ***")
-        text_file.write("Total time taken:")
-        text_file.write(time_taken(elapsed_time_long))
-        print("Total time taken:",time_taken(elapsed_time_long))
+        #elapsed_time_long = time.monotonic() - start_time_long
+        #print("*** All runs completed ***")
+        #text_file.write("Total time taken:")
+        #text_file.write(time_taken(elapsed_time_long))
+        #print("Total time taken:",time_taken(elapsed_time_long))
         text_file.close()
         
         print(' ===============================================================') 
