@@ -92,7 +92,7 @@ def save_image(image, fname, scaleinfo=None):
 	return info[270] # just in case you want it for some reason
     
 
-def constructSTModel(state, params) :
+def constructSTModel(weights, biases, params) :
 	global g_graph
 	g_graph = {} 
 
@@ -148,33 +148,46 @@ def constructSTModel(state, params) :
 
 # Create and save the picke file of paramters 
 def saveState(sess, weight_dic, bias_dic, parameters, fname) :
-    return None
-        # FUNCTION NEEDS TO BE CHANGED!!!!
 	# create object to stash tensorflow variables in
-	#state={}
+	state={}
 	#for v in vlist :
 	#	state[v.name] = sess.run(v)
 
+	# convert tensors to python arrays
+	for n in weight_dic.keys():
+		weight_dic[n] = sess.run(weight_dic[n])
+
+	for b in bias_dic.keys():
+		bias_dic[b] = sess.run(bias_dic[b])
+
 	# combine state and parameters into a single object for serialization
-	#netObject={
-	#	'state' : state,
-	#	'parameters' : parameters
-	#}
-	#pickle.dump(netObject, open( fname, "wb" ))
+	netObject={
+		#'state' : state,
+		'weight_dic' : weight_dic,
+		'bias_dic' : bias_dic, 
+		'parameters' : parameters
+	}
+	pickle.dump(netObject, open( fname, "wb" ))
 
 
 # Load the pickle file of parameters
 def load(pickleFile, randomize=0) :
 	print(' will read state from ' + pickleFile)
 	netObject=pickle.load( open( pickleFile, "rb" ) )
-	state = netObject['state']
+	#state = netObject['state']
+	weight_dic = netObject['weight_dic']
+	bias_dic = netObject['bias_dic']
 	parameters = netObject['parameters']
 
 	if randomize ==1 :
 		print('randomizing weights')
-		for n in state.keys():
-			print('shape of state[' + n + '] is ' + str(state[n].shape))
-			state[n] = .2* np.random.random_sample(state[n].shape).astype(np.float32) -.1
+		for n in weight_dic.keys():
+			print('shape of state[' + n + '] is ' + str(weight_dic[n].shape))
+			weight_dic[n] = .2* np.random.random_sample(weight_dic[n].shape).astype(np.float32) -.1
+
+	print("weight keys are " + str(weight_dic.keys()))
+	print("bias keys are " + str(bias_dic.keys()))
+
 
 	for p in parameters.keys() :
 		print('param['  + p + '] = ' + str(parameters[p]))
@@ -184,10 +197,11 @@ def load(pickleFile, randomize=0) :
 	height = parameters['k_height']
 
 	global width 
-	width = parameters['k_width']
+	#width = parameters['k_width']
+	width = parameters['k_numFrames']
 
 	global depth
 	depth = parameters['k_inputChannels']
 
-	return constructSTModel(state, parameters)
+	#return constructSTModel(weight_dic, bias_dic, parameters)
 
