@@ -13,7 +13,7 @@ pyprog=`which ./esc50_us8K_classification.py`
 #freqorientation=2D
 #datafolder=stft_png
 
-n_epochs=200
+n_epochs=10
 batchsize=100
 
 l1channels=180

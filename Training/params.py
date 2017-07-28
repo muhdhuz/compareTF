@@ -23,7 +23,6 @@ parser.add_argument('--fcsize', type=int, help='Dimension of the final fully-con
 parser.add_argument('--numLabels', type=int, help='number of classes in data', choices=[2,50], default=50) 
 parser.add_argument('--filesPerFold', type=int, help='number of classes in data', choices=[2,400], default=400) #default for testing
 
-
 parser.add_argument('--save_path', type=str, help='output root directory for logging',  default='../Results') 
 
 FLAGS, unparsed = parser.parse_known_args()
@@ -43,7 +42,6 @@ STFT_dataset_path = "../DataPrep/" + FLAGS.datafolder
 #MFCC_dataset_path = "C:/Users/Huz/Documents/python_scripts/Comparing_TF_representations/ESC50/data/1/mfcc"
 
 INDIR = STFT_dataset_path
-
 save_path = FLAGS.save_path #path to save output
 if not os.path.isdir(save_path): os.mkdir(save_path)
 

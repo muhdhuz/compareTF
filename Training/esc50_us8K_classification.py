@@ -43,7 +43,7 @@ parameters={
     'k_downsampledHeight' : m.k_downsampledHeight, 
     'k_downsampledWidth' : m.k_downsampledWidth,
     'freqorientation' : FRE_ORIENTATION,
-    'transform' : 
+    'transform' : FLAGS.datafolder
 }
 
 
