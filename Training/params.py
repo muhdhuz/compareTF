@@ -12,7 +12,6 @@ parser.add_argument('--model', type=str, help='load the model to train', default
 parser.add_argument('--freqbins', type=int, help='number of frequency bins in the spectrogram input', default=513) 
 parser.add_argument('--numFrames', type=int, help='number of frames in the spectrogram input (must be divisible by 4)', default=424) 
 
-
 parser.add_argument('--batchsize', type=int, help='number of data records per training batch', default=20) #default for testing
 parser.add_argument('--n_epochs', type=int, help='number of epochs to use for training', default=8) #default for testing
 
@@ -48,15 +47,19 @@ INDIR = STFT_dataset_path
 save_path = FLAGS.save_path #path to save output
 if not os.path.isdir(save_path): os.mkdir(save_path)
 
-text_file_name = "/test_small1D" #name of textfile to output with results
+text_file_name = "/" + FLAGS.datafolder + FLAGS.freqorientation #name of textfile to output with results
 
-K_FREQBINS = FLAGS.freqbins #103 #pixel height ie. frequency bins
 
 # Image/Data Parameters
+K_FREQBINS = FLAGS.freqbins #103 #pixel height ie. frequency bins
 K_NUMFRAMES = FLAGS.numFrames # 43  #pixel width ie. time bins
+N_LABELS = FLAGS.numLabels #no.of classes
 
-
-FRE_ORIENTATION=FLAGS.freqorientation
+FRE_ORIENTATION = FLAGS.freqorientation #supports 2D and 1D
+if FRE_ORIENTATION in ["2D","1D"]:
+    pass
+else:
+    raise ValueError("please only enter '1D' or '2D'")
 if FRE_ORIENTATION == "1D" :
 	NUM_CHANNELS = K_FREQBINS #no of image channels
 	K_HEIGHT =1
@@ -67,22 +70,12 @@ else :
 	print("orientation is 2D, so setting NUM_CHANNELS to " + str(1))
 
 
-N_LABELS = FLAGS.numLabels #no.of classes
-
-FRE_ORIENTATION = FLAGS.freqorientation #supports 2D and 1D
-if FRE_ORIENTATION in ["2D","1D"]:
-    pass
-else:
-    raise ValueError("please only enter '1D' or '2D'")
-
 #see threading and queueing info: https://www.tensorflow.org/programmers_guide/reading_data
 files_per_fold = FLAGS.filesPerFold #no. of samples per fold
 NUM_THREADS = 4 #threads to read in TFRecords; dont want more threads than there are 
 
 
-
 # Model Parameters
-
 L1_CHANNELS = FLAGS.l1channels
 L2_CHANNELS = FLAGS.l2channels
 L3_CHANNELS = FLAGS.l3channels
@@ -92,7 +85,6 @@ FC_SIZE = FLAGS.fcsize
 # Learning Parameters
 BATCH_SIZE = FLAGS.batchsize
 EPOCHS = FLAGS.n_epochs
-
 TOTAL_RUNS = 1 #no. of rounds of k-fold cross validation done
 
 test_batches_per_epoch = max(1, int(files_per_fold/BATCH_SIZE)) #include check for batch_size > files_per_fold
