@@ -90,9 +90,92 @@ def save_image(image, fname, scaleinfo=None):
 	savimg.save(fname, tiffinfo=info)
 	#print('RGB2TiffGray : tiffinfo is ' + str(info))
 	return info[270] # just in case you want it for some reason
-    
 
-def constructSTModel(weights, biases, params) :
+##===========================================================================================================
+def conv2d(x, W, b, strides=1):
+    # Conv2D wrapper, with bias and relu activation
+    x = tf.nn.conv2d(x, W, strides=[1, strides, strides, 1], padding='SAME')
+    x = tf.nn.bias_add(x, b)
+    return tf.nn.relu(x)
+
+def maxpool2d(x, k_h=2, k_w=2):
+    # MaxPool2D wrapper
+    # ksize = [batch, height, width, channels]
+    return tf.nn.max_pool(x, ksize=[1, k_h, k_w, 1], strides=[1, k_h, k_w, 1], padding='SAME')
+
+# This can produce any model that model1 and model3 can produce (1D or 2D, 1 layer or 2 layer)
+# Rather than keeping weights, biases, and other model ops separate, and producing the logits layer as a return value,
+#     it returns all variables and ops as a graph object
+def constructSTModel(weights, biases, params) : #nlaysers is either 1 or 3
+
+	print("now construct graph ")
+	global g_graph
+	g_graph = {} 
+
+    #k_height = params['k_height']
+    #k_inputChannels = params['k_inputChannels']
+    #k_ConvRows = params['K_ConvRows'] #conv kernel height
+    #k_ConvCols = params['K_ConvCols'] #conv kernel width
+    #k_poolRows = params['k_poolRows']
+    #k_downsampledHeight = params['k_downsampledHeight']
+    #k_downsampledWidth = params['k_downsampledHeight']
+
+	# model params common to both 1D and 2D
+	#K_NUMCONVLAYERS = params['K_NUMCONVLAYERS']
+	#k_ConvStrideRows = params['k_ConvStrideRows'] #kernel horizontal stride
+	#k_ConvStrideCols = params['k_ConvStrideCols'] #kernel vertical stride
+	#k_poolStrideRows = params['k_poolStrideRows']
+
+
+	#Huz - is this right??
+	if params['K_NUMCONVLAYERS'] == 3 :
+		k_poolCols=2
+	else :
+		k_poolCols=4
+
+
+	g_graph["X"] = tf.Variable(np.zeros([1,params['k_height'], params['k_numFrames'], params['k_inputChannels']]), dtype=tf.float32, name="s_X")
+	
+	g_graph["w1"]=tf.constant(weights["wc1"], name="s_w1")
+	g_graph["b1"]=tf.constant(biases["bc1"], name="s_b1")
+	g_graph["h1"]=conv2d(g_graph["X"], g_graph["w1"], g_graph["b1"])
+	g_graph["h1pooled"] = maxpool2d(g_graph["h1"], k_h=params['k_poolRows'], k_w=k_poolCols)
+
+
+	g_graph["W_fc1"] = tf.constant(weights['wd1'], name="s_W_fc1")
+	g_graph["b_fc1"] = tf.constant(biases["bd1"], name="s_b_fc1")
+
+	if params['K_NUMCONVLAYERS']== 3: 
+
+		g_graph["w2"]=tf.constant(weights["wc2"], name="s_w2")
+		g_graph["b2"]=tf.constant(biases["bc2"], name="s_b2")
+		g_graph["h2"]=conv2d(g_graph["h1pooled"], g_graph["w2"], g_graph["b2"])
+		g_graph["h2pooled"] = maxpool2d(g_graph["h2"], k_h=params['k_poolRows'], k_w=k_poolCols)
+
+		g_graph["w3"]=tf.constant(weights["wc3"], name="s_w3")
+		g_graph["b3"]=tf.constant(biases["bc3"], name="s_b3")
+		g_graph["h3"]=conv2d(g_graph["h2pooled"], g_graph["w3"], g_graph["b3"])
+
+		g_graph["fc1"] = tf.reshape(g_graph["h3"], [-1,  g_graph["W_fc1"].get_shape().as_list()[0]])  #convlayers_output
+
+	else :
+		g_graph["fc1"] = tf.reshape(g_graph["h1pooled"], [-1, g_graph["W_fc1"].get_shape().as_list()[0]]) #convlayers_output
+	g_graph["h_fc1"] = tf.nn.relu(tf.matmul(g_graph["fc1"], g_graph["W_fc1"]) + g_graph["b_fc1"], name="s_h_fc1")
+
+
+	g_graph["W_fc2"] = tf.constant(weights['wout'], name="s_W_fc2")
+	g_graph["b_fc2"] = tf.constant(biases['bout'], name="s_b_fc2")
+
+
+	g_graph["logits"] = tf.add(tf.matmul(g_graph["h_fc1"], g_graph["W_fc2"]) , g_graph["b_fc2"] , name="s_logits")  #"out"
+
+	g_graph["softmax_preds"] = tf.nn.softmax(logits=g_graph["logits"], name="s_softmax_preds")
+
+	print("graph built - returning ")
+	return g_graph
+
+#=============================================================================================================
+def constructSTModel_old(weights, biases, params) :
 	global g_graph
 	g_graph = {} 
 
@@ -182,8 +265,14 @@ def load(pickleFile, randomize=0) :
 	if randomize ==1 :
 		print('randomizing weights')
 		for n in weight_dic.keys():
-			print('shape of state[' + n + '] is ' + str(weight_dic[n].shape))
+			print('shape of weights[' + n + '] is ' + str(weight_dic[n].shape))
 			weight_dic[n] = .2* np.random.random_sample(weight_dic[n].shape).astype(np.float32) -.1
+
+		print('randomizing biases')
+		for n in bias_dic.keys():
+			print('shape of biases[' + n + '] is ' + str(bias_dic[n].shape))
+			bias_dic[n] = .2* np.random.random_sample(bias_dic[n].shape).astype(np.float32) -.1
+
 
 	print("weight keys are " + str(weight_dic.keys()))
 	print("bias keys are " + str(bias_dic.keys()))
@@ -203,5 +292,5 @@ def load(pickleFile, randomize=0) :
 	global depth
 	depth = parameters['k_inputChannels']
 
-	#return constructSTModel(weight_dic, bias_dic, parameters)
+	return constructSTModel(weight_dic, bias_dic, parameters)
 
